@@ -3,33 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>시작하기 - 나의 운명의 강아지 찾기</title>
+    <title>시작하기 - 멍글멍글</title>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
-        html, body { height: 100%; margin: 0; font-family: 'Pretendard', sans-serif; background-color: #FFFBF5; display: flex; justify-content: center; align-items: center; }
-        .screen-container { background-color: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 380px; box-sizing: border-box; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07); text-align: center; }
-        .illustration { font-size: 70px; margin-bottom: 20px; }
-        h1 { font-size: 26px; font-weight: 900; color: #333; margin-bottom: 10px; }
-        p { font-size: 16px; color: #666; line-height: 1.6; margin-bottom: 30px; }
-        .btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 12px; background-color: #FF7A00; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.2s ease-in-out; box-shadow: 0 4px 10px rgba(255, 122, 0, 0.3); }
-        .btn:hover { background-color: #E66A00; transform: translateY(-2px); }
-    </style>
-    <script>
-        // Ensure / redirects to this landing page
-        if (location.pathname === '/' || location.pathname === '/index.html') {
-            // no-op: nginx already serves index.html which redirects to main.html
+        
+        html, body {
+            height: 100%; margin: 0; font-family: 'Pretendard', sans-serif;
+            background-color: #FFFBF5; display: flex; justify-content: center; align-items: center;
         }
-    </script>
-    </head>
+        .screen-container {
+            background-color: white; border-radius: 20px; padding: 40px;
+            width: 100%; max-width: 380px; box-sizing: border-box;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07); text-align: center;
+            overflow: hidden; 
+        }
+        
+        /* === ✨ 로고 이미지 원형 자르기 및 애니메이션 ✨ === */
+        .logo-wrapper {
+            width: 220px; /* 로고가 표시될 원형 영역의 너비 */
+            height: 220px; /* 로고가 표시될 원형 영역의 높이 */
+            margin: 0 auto 30px auto; /* 중앙 정렬 및 아래 마진 */
+            border-radius: 50%; /* ✨ 이미지를 원형으로 자르는 핵심 속성 ✨ */
+            overflow: hidden; /* 원형 밖으로 이미지가 나가지 않도록 */
+            display: flex; /* 이미지 중앙 정렬을 위해 */
+            justify-content: center; align-items: center;
+            
+            /* ✨ 테두리 애니메이션 적용 ✨ */
+            border: 5px solid transparent; /* 초기 테두리는 투명 */
+            animation: borderFadeIn 0.8s ease-out forwards;
+            animation-delay: 0.8s; /* 로고 등장 후 테두리 나타나게 */
+            position: relative; /* 테두리 그림자 효과를 위해 */
+        }
+        /* 테두리에 그림자 효과 추가 */
+        @keyframes borderFadeIn {
+            0% { border-color: transparent; }
+            100% { border-color: #FF7A00; box-shadow: 0 0 15px rgba(255, 122, 0, 0.4); }
+        }
+
+        .logo-illustration {
+            width: 100%; /* 부모 컨테이너(logo-wrapper)에 꽉 차게 */
+            height: 100%;
+            object-fit: cover; /* 이미지가 원형 영역에 꽉 차도록 (일부 잘릴 수 있음) */
+            /* object-fit: contain; 은 이미지가 잘리지 않고 비율 유지 (여백 생길 수 있음) */
+
+            /* ✨ 로고 등장 애니메이션 적용 ✨ */
+            animation: fadeInScale 1.0s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.6); /* 시작 시 작게 */
+        }
+        
+        /* 로고 등장 애니메이션 */
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.6); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            font-size: 26px; font-weight: 900; color: #333;
+            margin-top: 0; margin-bottom: 12px;
+            opacity: 0; animation: fadeInUp 0.8s ease-out forwards; animation-delay: 1.0s;
+        }
+        p {
+            font-size: 16px; color: #666; line-height: 1.6;
+            margin-top: 0; margin-bottom: 40px;
+            opacity: 0; animation: fadeInUp 0.8s ease-out forwards; animation-delay: 1.2s;
+        }
+        .btn {
+            display: block; width: 90%; margin: 0 auto; padding: 16px;
+            border: none; border-radius: 12px; background-color: #FF7A00; color: white;
+            font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(255, 122, 0, 0.3); text-decoration: none;
+            opacity: 0; animation: fadeInUp 0.8s ease-out forwards; animation-delay: 1.4s;
+        }
+        .btn:hover { background-color: #E66A00; transform: translateY(-2px); }
+
+        /* 기타 텍스트/버튼 등장 애니메이션 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
 <body>
     <div class="screen-container">
-        <div class="illustration">👋🐶</div>
+        
+        <div class="logo-wrapper">
+            <img src="./assets/멍글멍글.png" alt="몽글몽글 로고" class="logo-illustration">
+        </div>
+        
         <h1>나의 운명의 강아지를 찾기 위한 첫걸음!</h1>
         <p>
             간단한 체크리스트와 AI 분석을 통해<br>
             당신과 평생을 함께할 가족을 찾아드릴게요.
         </p>
-        <button class="btn" onclick="window.location.href='/checklist.html';">운명의 강아지 찾기 시작!</button>
+        <a href="./checklist.html" class="btn">운명의 강아지 찾기 시작!</a>
     </div>
 </body>
 </html>
