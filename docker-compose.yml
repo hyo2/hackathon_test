@@ -36,10 +36,17 @@ services:
     env_file: ./.env
     environment:
       AI_BASE_URL: ${AI_BASE_URL}
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     depends_on:
       - ai-vision
+      - db
     ports:
       - "${SPRING_PORT:-8081}:8080"
+    # DB가 ready 될 때까지 기다리도록 entrypoint 수정
+    entrypoint: ["./wait-for-it.sh", "db:3306", "--timeout=60", "--strict", "--", "java", "-jar", "app.jar"]
 
   nginx:
     build: ./nginx
@@ -52,3 +59,20 @@ services:
       - "${NGINX_PORT:-8085}:80"
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
+
+  db:
+    image: mysql:8.0
+    container_name: hackathon_test-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hackathon
+      MYSQL_USER: team25
+      MYSQL_PASSWORD: team25
+    ports:
+      - "3308:3306"  # 로컬에서 3308 포트로 접속
+    volumes:
+      - db_data:/var/lib/mysql 
+      - ./db_init.sql:/docker-entrypoint-initdb.d/db_init.sql  # 초기 데이터
+  
+volumes:
+  db_data:
