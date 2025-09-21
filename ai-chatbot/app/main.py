@@ -21,6 +21,16 @@ class ChatByAnimalRequest(BaseModel):
     messages: List[ChatMessage]
     model: Optional[str] = None
 
+class ChecklistRequest(BaseModel):
+    gender: Optional[str] = None
+    housing: Optional[str] = None
+    family: Optional[str] = None
+    time_with_pet: Optional[str] = None
+    walking_freq: Optional[str] = None
+
+# In-memory storage for checklist data (in production, use a database)
+user_checklists = {}
+
 def _build_client_and_model(model: Optional[str]):
     """
     Returns (client, model_name, is_fake)
@@ -74,6 +84,34 @@ def _fake_llm_reply(messages: List[dict], system_prompt: Optional[str] = None) -
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.post("/checklist")
+async def save_checklist(req: ChecklistRequest):
+    """
+    Save user checklist data for personalized chat responses.
+    For now, stores in memory with a simple key (in production, use user ID).
+    """
+    try:
+        # Simple key generation (in production, use proper user authentication)
+        user_key = "default_user"  # Could be improved with session/user management
+        
+        checklist_data = {
+            "gender": req.gender,
+            "housing": req.housing,
+            "family": req.family,
+            "time_with_pet": req.time_with_pet,
+            "walking_freq": req.walking_freq
+        }
+        
+        user_checklists[user_key] = checklist_data
+        
+        return {
+            "status": "success", 
+            "message": "체크리스트가 저장되었습니다",
+            "data": checklist_data
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Checklist save failed: {e}")
 
 @app.post("/chat")
 async def chat(req: ChatRequest):

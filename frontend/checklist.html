@@ -1,72 +1,214 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>체크리스트 - 나의 운명의 강아지 찾기</title>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
-        html, body { margin: 0; font-family: 'Pretendard', sans-serif; background-color: #FFFBF5; display: flex; justify-content: center; padding-top: 40px; padding-bottom: 40px; }
-        .screen-container { background-color: white; border-radius: 20px; padding: 30px; width: 100%; max-width: 380px; box-sizing: border-box; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07); }
-        .progress-bar { font-size: 14px; color: #aaa; text-align: center; margin-bottom: 25px; font-weight: 500; }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* 페이지 전체 스크롤 막기 */
+            font-family: 'Pretendard', sans-serif;
+            background-color: #FFFBF5;
+            display: flex;
+            justify-content: center;
+        }
+
+        .screen-container {
+            width: 100%;
+            max-width: 380px;
+            height: 100%;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow-y: scroll; /* 내부 스크롤 */
+            padding: 30px;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .screen-container::-webkit-scrollbar { display: none; }
+
+        .progress-bar {
+            font-size: 14px;
+            color: #aaa;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
         .progress-bar span { font-weight: bold; color: #FF7A00; }
-        .question-title { font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 20px; color: #333; }
-        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
-        .option-card { border: 2px solid #ddd; border-radius: 12px; padding: 20px 10px; text-align: center; cursor: pointer; transition: all 0.2s ease-in-out; font-weight: 500; }
-        .option-card .icon { font-size: 24px; margin-bottom: 8px; }
-        .option-card:hover, .option-card.selected { border-color: #FF7A00; background-color: #FFF5E1; transform: translateY(-3px); font-weight: bold; }
-        .btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 12px; background-color: #FF7A00; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+
+        .question-title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-weight: 500;
+        }
+
+        .option-card .icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .option-card:hover,
+        .option-card.selected {
+            border-color: #FF7A00;
+            background-color: #FFF5E1;
+            transform: translateY(-3px);
+            font-weight: bold;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background-color: #FF7A00;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            text-decoration: none;
+            text-align: center;
+        }
+
         .btn:hover { background-color: #E66A00; }
     </style>
 </head>
+
 <body>
+
     <div class="screen-container">
-        <div class="progress-bar"><span>1단계: 책임감 체크리스트</span> → 2단계 → 3단계</div>
-
-        <div class="question-title">보호자의 성별을 알려주세요.</div>
-        <div class="option-grid">
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🙋‍♂️</div><div>남성</div></div>
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🙋‍♀️</div><div>여성</div></div>
+        <div class="progress-bar">
+            <span>1단계: 책임감 체크리스트</span> → 2단계 → 3단계
         </div>
-
+        
+        <div class="question-title">보호자의 성별을 알려주세요.</div>
+        <div class="option-grid" data-group="gender">
+            <div class="option-card" data-value="male" onclick="toggleSelect(this)">
+                <div class="icon">🙋‍♂️</div><div>남성</div>
+            </div>
+            <div class="option-card" data-value="female" onclick="toggleSelect(this)">
+                <div class="icon">🙋‍♀️</div><div>여성</div>
+            </div>
+        </div>
+        
         <div class="question-title">어떤 환경에서 함께하게 되나요?</div>
-        <div class="option-grid">
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🏡</div><div>마당 있는 집</div></div>
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🏢</div><div>아파트/빌라</div></div>
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🏘️</div><div>원룸</div></div>
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🤷</div><div>기타</div></div>
+        <div class="option-grid" data-group="housing">
+            <div class="option-card" data-value="yard" onclick="toggleSelect(this)">
+                <div class="icon">🏡</div><div>마당 있는 집</div>
+            </div>
+            <div class="option-card" data-value="apartment" onclick="toggleSelect(this)">
+                <div class="icon">🏢</div><div>아파트/빌라</div>
+            </div>
+            <div class="option-card" data-value="oneroom" onclick="toggleSelect(this)">
+                <div class="icon">🏘️</div><div>원룸</div>
+            </div>
+            <div class="option-card" data-value="other" onclick="toggleSelect(this)">
+                <div class="icon">🤷</div><div>기타</div>
+            </div>
         </div>
 
         <div class="question-title">누구와 함께 살고 계신가요?</div>
-        <div class="option-grid">
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">👤</div><div>혼자 살아요</div></div>
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">👨‍👩‍👧‍👦</div><div>가족과 함께</div></div>
+        <div class="option-grid" data-group="family">
+            <div class="option-card" data-value="alone" onclick="toggleSelect(this)">
+                <div class="icon">👤</div><div>혼자 살아요</div>
+            </div>
+            <div class="option-card" data-value="with_family" onclick="toggleSelect(this)">
+                <div class="icon">👨‍👩‍👧‍👦</div><div>가족과 함께</div>
+            </div>
         </div>
-
+        
         <div class="question-title">하루에 얼마나 함께 있을 수 있나요?</div>
-        <div class="option-grid">
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">☀️</div><div>거의 하루 종일</div></div>
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🌙</div><div>주로 저녁에만</div></div>
+        <div class="option-grid" data-group="time_with_pet">
+            <div class="option-card" data-value="all_day" onclick="toggleSelect(this)">
+                <div class="icon">☀️</div><div>거의 하루 종일</div>
+            </div>
+            <div class="option-card" data-value="evening_only" onclick="toggleSelect(this)">
+                <div class="icon">🌙</div><div>주로 저녁에만</div>
+            </div>
         </div>
 
         <div class="question-title">산책은 얼마나 자주 시켜줄 수 있나요?</div>
-        <div class="option-grid">
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🐕‍🦺💨</div><div>하루에 2번 이상</div></div>
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🚶‍♂️</div><div>하루에 1번</div></div>
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🏞️</div><div>주말에 집중적으로</div></div>
-            <div class="option-card" onclick="toggleSelect(this)"><div class="icon">🐾</div><div>필요할 때 가끔</div></div>
+        <div class="option-grid" data-group="walking_freq">
+            <div class="option-card" data-value="twice_daily" onclick="toggleSelect(this)">
+                <div class="icon">🐕‍🦺💨</div><div>하루에 2번 이상</div>
+            </div>
+            <div class="option-card" data-value="once_daily" onclick="toggleSelect(this)">
+                <div class="icon">🚶‍♂️</div><div>하루에 1번</div>
+            </div>
+            <div class="option-card" data-value="weekends" onclick="toggleSelect(this)">
+                <div class="icon">🏞️</div><div>주말에 집중적으로</div>
+            </div>
+            <div class="option-card" data-value="sometimes" onclick="toggleSelect(this)">
+                <div class="icon">🐾</div><div>필요할 때 가끔</div>
+            </div>
         </div>
-
-        <button class="btn" onclick="window.location.href='/upload.html';">모두 답했어요!</button>
+        
+        <button class="btn" id="submit-btn">모두 답했어요!</button>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        function toggleSelect(element){
-            const parent = element.parentElement;
-            const siblings = parent.querySelectorAll('.option-card');
-            siblings.forEach(el => el.classList.remove('selected'));
+        const answers = {};
+
+        function toggleSelect(element) {
+            const parentGrid = element.closest('.option-grid');
+            if (!parentGrid) return;
+
+            const allCardsInGroup = parentGrid.querySelectorAll('.option-card');
+            allCardsInGroup.forEach(card => card.classList.remove('selected'));
+
             element.classList.add('selected');
+
+            // 선택값 저장
+            const group = parentGrid.dataset.group;
+            const value = element.dataset.value;
+            answers[group] = value;
+
+            console.log("사용자 체크리스트 현재 선택값:", answers);
         }
+
+        document.getElementById("submit-btn").addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+                const res = await axios.post("/api/checklist", answers);
+                console.log("서버 응답:", res.data);
+                window.location.href = '/upload.html';
+            } catch (err) {
+                console.error("체크리스트 전송 실패:", err);
+            }
+        });
     </script>
+
 </body>
 </html>
