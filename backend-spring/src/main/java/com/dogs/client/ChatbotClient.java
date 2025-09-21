@@ -17,7 +17,7 @@ public class ChatbotClient {
 
 	private final WebClient webClient;
 
-	public ChatbotClient(@Value("${ai.base-url}") String baseUrl, WebClient.Builder builder) {
+	public ChatbotClient(@Value("${chatbot.base-url}") String baseUrl, WebClient.Builder builder) {
 		this.webClient = builder.baseUrl(baseUrl).build();
 	}
 
@@ -29,17 +29,15 @@ public class ChatbotClient {
 		System.out.println("Chatbot API로 전송하는 JSON: " + json);
 		
 		try {
-			
 			return webClient.post()
 					.uri("/checklist")
 					.contentType(MediaType.APPLICATION_JSON)
 					.bodyValue(request)
 					.retrieve()
 					.bodyToMono(String.class);
-			
 		} catch (WebClientResponseException e) {
 			System.out.println("Chatbot API 호출 실패: " + e.getStatusCode() + ", " + e.getResponseBodyAsString());
-			return Mono.just("Chatbot API 호출 실패");
+			return Mono.just("Chatbot API 호출 실패: " + e.getMessage());
 		}
 	}
 

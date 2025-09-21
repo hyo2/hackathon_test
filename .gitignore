@@ -114,3 +114,17 @@ coverage.xml
 # Backup files
 *.bak
 *.backup
+
+# Java / Maven build outputs
+backend-spring/target/
+backend-spring/bin/
+*.class
+
+# Eclipse / STS workspace & project metadata
+.project
+.classpath
+.settings/
+.metadata/
+
+# IntelliJ module files (already covered by .idea/ but explicit for clarity)
+*.iml

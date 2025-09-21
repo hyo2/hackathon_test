@@ -37,7 +37,7 @@ public class VisionClient {
 		System.out.println("Vision API로 전송하는 housingDogs JSON: " + json);
 
 		try {
-		return webClient.post().uri("/housing") // Vision Model API - 크기에 따른 유기견 정보 전송 엔드포인트
+		return webClient.post().uri("/animals/housing") // 임시 경로 - FastAPI에 구현 필요
 				.contentType(MediaType.APPLICATION_JSON).bodyValue(dogs) // List<Dog> → JSON 자동 변환
 				.retrieve().bodyToMono(String.class);
 		} catch (WebClientResponseException e) {
@@ -71,7 +71,7 @@ public class VisionClient {
 	public Mono<String> sendUserImg(MultipartFile image) {
 		
 		try {
-		return webClient.post().uri("/ai/classify") // 원래 프론트에 있던 임시 경로(필요시 수정)
+		return webClient.post().uri("/classify") // FastAPI의 실제 경로
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.bodyValue(buildMultipartBody(image))
 				.retrieve()
