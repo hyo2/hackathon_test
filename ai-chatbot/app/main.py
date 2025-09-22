@@ -29,6 +29,7 @@ class ChecklistRequest(BaseModel):
     walking_freq: Optional[str] = None
 
 # In-memory storage for checklist data (in production, use a database)
+# TODO: LangChain/LangGraph 통합 시 활용 예정
 user_checklists = {}
 
 def _build_client_and_model(model: Optional[str]):
@@ -62,7 +63,39 @@ def _extract_field(info_list, key: str) -> str:
     return ""
 
 
+def _get_user_checklist(user_key: str = "default_user") -> dict:
+    """
+    Retrieve user checklist data for personalized chat responses.
+    Used for LangChain/LangGraph context enhancement.
+    """
+    return user_checklists.get(user_key, {})
+
 def _fake_llm_reply(messages: List[dict], system_prompt: Optional[str] = None) -> str:
+    """Very small local stub to simulate an assistant in dev.
+    Echoes the last user message with a friendly Korean persona.
+    TODO: Replace with LangChain/LangGraph implementation
+    """
+    user_text = ""
+    for m in reversed(messages):
+        if m.get("role") == "user":
+            user_text = m.get("content", "")
+            break
+    
+    # Get user checklist for personalized responses
+    checklist = _get_user_checklist()
+    context_info = ""
+    if checklist:
+        context_info = f" (사용자 정보: {checklist.get('housing', '정보없음')} 환경, {checklist.get('family', '정보없음')} 가족구성) "
+    
+    intro = "안녕하세요, 반가워요! 저는 임시 챗봇이에요(오프라인 모드). "
+    if system_prompt:
+        intro += "(프로필 기반 답변을 흉내 내는 중) "
+    if not user_text:
+        return intro + "무엇이든 편하게 물어보세요. 멍! 🐶"
+    return (
+        f"{intro}{context_info}방금 이렇게 말씀하셨어요: '{user_text}'. "
+        "지금은 간단한 데모 모드라 상세한 답변은 어렵지만, 필요한 주제를 더 알려주시면 최대한 도와볼게요! 🐾"
+    )
     """Very small local stub to simulate an assistant in dev.
     Echoes the last user message with a friendly Korean persona.
     """
@@ -89,11 +122,12 @@ def health():
 async def save_checklist(req: ChecklistRequest):
     """
     Save user checklist data for personalized chat responses.
-    For now, stores in memory with a simple key (in production, use user ID).
+    This data will be used for LangChain/LangGraph integration to provide 
+    personalized recommendations and chat experiences.
     """
     try:
         # Simple key generation (in production, use proper user authentication)
-        user_key = "default_user"  # Could be improved with session/user management
+        user_key = "default_user"  # TODO: Improve with session/user management
         
         checklist_data = {
             "gender": req.gender,
@@ -171,6 +205,21 @@ async def chat_by_animal(animal_id: int = Path(..., ge=0), req: ChatByAnimalRequ
         region = os.getenv("SERVICE_REGION", "광주")
         preferred_domains = os.getenv("PREFERRED_DOMAINS", "kcanimal.or.kr")
 
+        # Get user checklist for personalized system prompt
+        checklist = _get_user_checklist()
+        lifestyle_context = ""
+        if checklist:
+            lifestyle_context = f"""
+[사용자 라이프스타일 정보]
+- 성별: {checklist.get('gender', '정보없음')}
+- 주거환경: {checklist.get('housing', '정보없음')}
+- 가족구성: {checklist.get('family', '정보없음')}  
+- 반려동물과 함께할 시간: {checklist.get('time_with_pet', '정보없음')}
+- 산책 가능 빈도: {checklist.get('walking_freq', '정보없음')}
+
+위 사용자 정보를 고려하여 이 반려견과의 매칭도와 주의사항을 제공해주세요.
+"""
+
         system_prompt = "\n".join([
             f"당신은 {region}시 유기견 보호소의 반려견 챗봇입니다.",
             "아래 프로필 정보에 기반하여 정중한 한국어로 답하고, 모르는 정보는 모른다고 답하세요.",
@@ -182,6 +231,7 @@ async def chat_by_animal(animal_id: int = Path(..., ge=0), req: ChatByAnimalRequ
             "",
             "[반려견 프로필]",
             profile_lines,
+            lifestyle_context,
         ])
 
         # 2) Call OpenAI
