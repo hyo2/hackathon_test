@@ -26,11 +26,11 @@ public class ChecklistController {
 		String housing = request.getHousing();
 		String visionResult = checklistService.sendDogsByHousing(housing);
 		
-		 // 전체 체크리스트 -> Chatbot API로 전송
-	    String chatbotResult = checklistService.sendChecklist(request);
+		// 전체 체크리스트 -> Chatbot API로 전송
+		String chatbotResult = checklistService.sendChecklist(request);
         
 	    // 결과 합쳐서 리턴
-	    return ResponseEntity.ok(", Vision_hosuing: " + visionResult + ", Chatbot: " + chatbotResult);
+	    return ResponseEntity.ok(", Vision_housing: " + visionResult + ", Chatbot: " + chatbotResult);
     }
 	
 }
