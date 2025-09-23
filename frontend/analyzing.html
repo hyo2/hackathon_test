@@ -28,25 +28,33 @@
 <body>
     <div class="screen-container">
         <div class="analysis-view">
-            <div class="photo-box"><img src="https://placehold.co/120x120/E6F0FF/333?text=User&font=pretendard" alt="사용자 사진"><div class="label">당신</div></div>
+            <div class="photo-box"><img id="user-photo-img" src="https://placehold.co/120x120/E6F0FF/333?text=User&font=pretendard" alt="사용자 사진"><div class="label">당신</div></div>
             <div class="scanner"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-            <div class="photo-box"><img id="dog-photo-img" src="https://placehold.co/120x120/F8D5A2/333?text=Dog1&font=pretendard" alt="강아지 사진"><div class="label">친구들</div></div>
+            <div class="photo-box"><img id="dog-photo-img" src="assets/dogs/Beagle.png" alt="강아지 사진"><div class="label">친구들</div></div>
         </div>
         <p class="status-text">AI가 당신과 가장 닮은 친구를 찾고 있어요...</p>
         <div class="progress-bar-container"><div class="progress-bar-fill"></div></div>
     </div>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userImage = localStorage.getItem('userImage');
+            if (userImage) {
+                const userPhotoElement = document.getElementById('user-photo-img');
+                userPhotoElement.src = userImage;
+            }
+        });
+
         const dogPhotoElement = document.getElementById('dog-photo-img');
         const dogImages = [
-            'https://placehold.co/120x120/F8D5A2/333?text=Dog1&font=pretendard',
-            'https://placehold.co/120x120/A2F8B5/333?text=Dog2&font=pretendard',
-            'https://placehold.co/120x120/F8A2A2/333?text=Dog3&font=pretendard',
-            'https://placehold.co/120x120/A2A9F8/333?text=Dog4&font=pretendard'
+            'assets/dogs/Beagle.png',
+            'assets/dogs/Border Collie.png',
+            'assets/dogs/Maltese.png',
+            'assets/dogs/Siberian Husky.png'
         ];
         let idx = 0;
         setInterval(()=>{ idx = (idx+1)%dogImages.length; dogPhotoElement.src = dogImages[idx]; }, 1000);
     // Redirect to list page with cache-busting version parameter
-    setTimeout(()=>{ window.location.href = '/listpage.html?v=3'; }, 3600);
+    setTimeout(()=>{ window.location.href = 'listpage.html?v=3'; }, 3600);
     </script>
 </body>
 </html>

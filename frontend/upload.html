@@ -81,6 +81,7 @@
                 console.warn('분석 실패, 임의 추천으로 진행합니다.', e);
                 sessionStorage.removeItem('classifyResult');
             }
+            localStorage.setItem('userImage', imagePreview.src);
             // Pass through to analyzing page (could append version if needed later)
             window.location.href = '/analyzing.html?v=3';
         });
