@@ -1,37 +1,208 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>가상 대화 - 나의 운명의 강아지 찾기</title>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
-        *, *::before, *::after { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Pretendard', sans-serif; background-color: #FFFBF5; }
-        .screen-container { width: 100%; max-width: 380px; height: 100%; margin: 0 auto; display: flex; flex-direction: column; background-color: white; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        .chat-header { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid #eee; flex-shrink: 0; background-color: white; }
-        .chat-header .back-btn { font-size: 24px; text-decoration: none; color: #333; margin-right: 15px; }
-        .chat-header img { width: 45px; height: 45px; border-radius: 50%; margin-right: 12px; object-fit: cover; }
-        .chat-header .name { font-weight: bold; font-size: 18px; }
-        .chat-window { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; overflow-y: scroll; background-color: #f9f9f9; -ms-overflow-style: none; scrollbar-width: none; }
-        .chat-window::-webkit-scrollbar { display: none; }
-        .message-bubble { max-width: 70%; padding: 12px 18px; border-radius: 20px; line-height: 1.6; margin-bottom: 10px; font-size: 16px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease-out; }
-        .message-bubble.visible { opacity: 1; transform: translateY(0); }
-        .from-dog { background-color: white; border: 1px solid #eee; border-bottom-left-radius: 4px; align-self: flex-start; }
-        .from-user { background-color: #FF7A00; color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
-        .chat-input-area { display: flex; align-items: center; padding: 10px 15px; background-color: white; border-top: 1px solid #eee; flex-shrink: 0; }
-        .chat-input-area input { flex-grow: 1; border: none; background-color: #f0f0f0; border-radius: 20px; padding: 12px 18px; font-size: 16px; }
-        .chat-input-area input:focus { outline: none; }
-        .chat-input-area button { background-color: #FF7A00; border: none; color: white; font-size: 18px; width: 45px; height: 45px; border-radius: 50%; margin-left: 10px; cursor: pointer; }
-        .back-to-list { padding: 15px; text-align: center; background-color: white; border-top: 1px solid #eee; }
-        .back-to-list a { color: #555; font-weight: bold; text-decoration: none; }
-        .typing-indicator { display: flex; align-items: center; margin-bottom: 10px; }
-        .typing-indicator span { height: 8px; width: 8px; background-color: #ccc; border-radius: 50%; margin: 0 2px; animation: bounce 1.2s infinite; }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Pretendard', sans-serif;
+            background-color: #FFFBF5;
+        }
+
+        .screen-container {
+            width: 100%;
+            max-width: 380px;
+            height: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            flex-shrink: 0;
+            background-color: white;
+        }
+
+        .chat-header .back-btn {
+            font-size: 24px;
+            text-decoration: none;
+            color: #333;
+            margin-right: 15px;
+        }
+
+        .chat-header img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+        }
+
+        .chat-header .name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .chat-window {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: scroll;
+            background-color: #f9f9f9;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .chat-window::-webkit-scrollbar {
+            display: none;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.6; /* 줄간격 */
+            white-space: pre-wrap;   /* \n 적용 */
+            word-break: break-word;  /* 긴 단어 자동 줄바꿈 */
+            margin-bottom: 10px;
+            font-size: 16px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease-out;
+        }
+
+        .message-bubble p { 
+            /* marked.parse()로 인한 기본 p태그 여백 삭제 */
+            margin: 0;  
+        }
+
+        .message-bubble.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .from-dog {
+            background-color: white;
+            border: 1px solid #eee;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .from-user {
+            background-color: #FF7A00;
+            color: white;
+            border-bottom-right-radius: 4px;
+            align-self: flex-end;
+        }
+
+        .chat-input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+            flex-shrink: 0;
+        }
+
+        .chat-input-area input {
+            flex-grow: 1;
+            border: none;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            padding: 12px 18px;
+            font-size: 16px;
+        }
+
+        .chat-input-area input:focus {
+            outline: none;
+        }
+
+        .chat-input-area button {
+            background-color: #FF7A00;
+            border: none;
+            color: white;
+            font-size: 18px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .back-to-list {
+            padding: 15px;
+            text-align: center;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .back-to-list a {
+            color: #555;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: #ccc;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.2s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-6px);
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="screen-container">
         <header class="chat-header">
@@ -44,48 +215,59 @@
         </main>
         <footer class="chat-input-area">
             <input type="text" id="user-input" placeholder="메시지를 입력하세요...">
-            <button id="send-btn" type="button">🚀</button>
+            <button id="send-btn" type="button">↗</button>
         </footer>
         <div class="back-to-list"><a href="/listpage.html">🏠 다른 친구들 보러가기</a></div>
     </div>
+    <!-- Markdown -> HTML  -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         const AI_BASE = '/ai';
         const params = new URLSearchParams(window.location.search);
-        const animalId = parseInt(params.get('id')||'0');
+        const animalId = parseInt(params.get('id') || '0');
         const chatWindow = document.getElementById('chat-window');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
         const dogNameEl = document.getElementById('dog-name');
-    const dogAvatarEl = document.getElementById('dog-avatar');
-    let history = [];
-    let isSending = false; // 중복 전송 방지 플래그
+        const dogAvatarEl = document.getElementById('dog-avatar');
+        let history = [];
+        let isSending = false; // 중복 전송 방지 플래그
 
-        function findField(infoArr, key){
+        function findField(infoArr, key) {
             if (!Array.isArray(infoArr)) return '';
-            for (const row of infoArr){
+            for (const row of infoArr) {
                 if (row[0] === key) return row[1] || '';
                 if (row[2] === key) return row[3] || '';
             }
             return '';
         }
-        async function loadHeader(){
-            try{
+        // 헤더 - 상단(강아지 이름, 강아지 프로필 사진)
+        async function loadHeader() {
+            try {
                 const res = await fetch(`${AI_BASE}/animals/${animalId}`);
                 const item = await res.json();
-                const name = findField(item.info,'이름') || '친구';
+                const name = findField(item.info, '이름') || '친구';
                 dogNameEl.textContent = name;
                 const img = item.thumbnail || (item.gallery && item.gallery[0]) || (item.images_mapped && item.images_mapped[0]) || (item.images && item.images[0]) || '';
-                if (img){ dogAvatarEl.src = img; dogAvatarEl.onerror = () => dogAvatarEl.src = '/assets/dog-placeholder.svg'; }
-            } catch(e){ console.warn(e); }
+                if (img) { dogAvatarEl.src = img; dogAvatarEl.onerror = () => dogAvatarEl.src = '/assets/dog-placeholder.svg'; }
+            } catch (e) { console.warn(e); }
         }
-        function appendBubble(text, from){
+        // 메시지 출력 - 말풍선 추가
+        function appendBubble(text, from) {
             const bubble = document.createElement('div');
-            bubble.className = 'message-bubble visible ' + (from==='user' ? 'from-user' : 'from-dog');
-            bubble.textContent = text;
+            bubble.className = 'message-bubble visible ' + (from === 'user' ? 'from-user' : 'from-dog');
+            console.log(text)
+            // Markdown -> HTML + 개행 유지
+            const mdToHtml = marked.parseInline(
+                text.replace(/\. /g, '.\n') // 온점 뒤는 개행
+                    .replace(/\n/g, '  \n') // 개행 처리
+            );
+            bubble.innerHTML = mdToHtml;
+
             chatWindow.appendChild(bubble);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
-        function showTyping(){
+        function showTyping() { // 타이핑 중...
             // 중복 표시 방지
             hideTyping();
             const typing = document.createElement('div');
@@ -95,24 +277,26 @@
             chatWindow.appendChild(typing);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
-        function hideTyping(){
+        function hideTyping() { // 응답 오면 showTyping 제거
             const t = document.getElementById('typing');
             if (t) t.remove();
         }
-        async function sendToApi(){
-            try{
+        // 챗봇 API
+        async function sendToApi() {
+            try {
                 const resp = await fetch(`${AI_BASE}/chat/animal/${animalId}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: history })
                 });
                 if (!resp.ok) throw new Error('chat failed');
                 const data = await resp.json();
                 return data.reply || '멍멍?';
-            }catch(e){
+            } catch (e) {
                 console.error(e);
                 return '멍멍... 지금 서버와 연결이 어려워요. 잠시 후 다시 시도해 주세요.';
             }
         }
-        async function handleSend(){
+        // 전송 버튼 - 사용자 채팅 입력 처리
+        async function handleSend() {
             if (isSending) return; // 이미 전송 중이면 무시
             const text = userInput.value.trim();
             if (!text) return;
@@ -121,13 +305,14 @@
             try {
                 appendBubble(text, 'user');
                 userInput.value = '';
+                // 기록
                 history.push({ role: 'user', content: text });
                 showTyping();
                 const reply = await sendToApi();
                 hideTyping();
-                if (reply.startsWith('추천서:')){
+                if (reply.startsWith('추천서:')) {
                     appendBubble('추천서가 준비되었어요. 아래 내용을 참고해 주세요!', 'dog');
-                    appendBubble(reply.replace('추천서:','').trim(), 'dog');
+                    appendBubble(reply.replace('추천서:', '').trim(), 'dog');
                 } else {
                     appendBubble(reply, 'dog');
                     history.push({ role: 'assistant', content: reply });
@@ -138,15 +323,17 @@
             }
         }
         sendBtn.addEventListener('click', handleSend);
-        userInput.addEventListener('keydown', (e)=>{
+        userInput.addEventListener('keydown', (e) => {
             // IME 조합 중(한글 입력 등) 또는 전송 중일 때는 무시
             if (e.isComposing || isSending) return;
-            if (e.key==='Enter'){
+            if (e.key === 'Enter') {
                 e.preventDefault();
                 handleSend();
             }
         });
         document.addEventListener('DOMContentLoaded', loadHeader);
     </script>
+
 </body>
+
 </html>
