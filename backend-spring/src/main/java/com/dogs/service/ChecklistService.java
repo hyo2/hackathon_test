@@ -30,6 +30,9 @@ public class ChecklistService {
     // housing 선택값에 따른 견종(대형/중소형) -> 모델로 전송
 	public String sendDogsByHousing(String housing) throws JsonProcessingException {
 		
+		// TODO: FastAPI에 /animals/housing 엔드포인트 구현 필요
+		// 현재는 임시로 더미 응답 반환
+		/*
 		List<Dog> housingDogs;
 		
         if ("yard".equals(housing)) {
@@ -42,6 +45,8 @@ public class ChecklistService {
         
         // Vision쪽 API로 데이터 전송
         return visionClient.sendHousingDogs(housingDogs).block();
+        */
+        return "Housing API not implemented yet";
     }
 
 	public String sendChecklist(ChecklistRequest request) throws JsonProcessingException {

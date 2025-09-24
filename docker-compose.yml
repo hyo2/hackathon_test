@@ -36,6 +36,10 @@ services:
     env_file: ./.env
     environment:
       AI_BASE_URL: ${AI_BASE_URL}
+<<<<<<< HEAD
+=======
+      CHATBOT_BASE_URL: ${CHATBOT_BASE_URL}
+>>>>>>> main
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}

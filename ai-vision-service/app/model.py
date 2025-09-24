@@ -28,9 +28,20 @@ def load_model(model_path, num_labels):
     return model, device
 
 
-def predict_image(image_path, model, device, label_names):
-    """
-    Predicts the class of an image using a sigmoid function for individual probabilities.
+def predict_image(image_path, model, device, label_names, top_k: int = 3):
+    """Predict top-k classes for an image using softmax (multi-class setting).
+
+    Args:
+        image_path: Path to image file.
+        model: Loaded model.
+        device: Torch device.
+        label_names: List of label names ordered by class index.
+        top_k: Number of top classes to return (capped by number of labels).
+
+    Returns:
+        top_labels (List[str]): Top-k label names (in descending probability order).
+        class_probs (Dict[str, float]): Mapping label -> probability percentage (0~100).
+        top_scores (List[float]): Probability percentages for each top label (same order as top_labels).
     """
     transform = transforms.Compose([
         transforms.Resize((456, 456)),
@@ -45,15 +56,14 @@ def predict_image(image_path, model, device, label_names):
     image_tensor = transform(image).unsqueeze(0).to(device)
 
     with torch.no_grad():
-        outputs = model(image_tensor)
+        outputs = model(image_tensor)  # shape: [1, C]
+        probs = torch.softmax(outputs, dim=1)[0]  # shape: [C]
 
-        probs = torch.sigmoid(outputs)[0]
+        k = min(top_k, probs.shape[0])
+        top_values, top_indices = probs.topk(k)
+        top_labels = [label_names[i] for i in top_indices.tolist()]
+        top_scores = [float(v.item()) * 100 for v in top_values]
 
-        predicted_label = [label_names[probs.argmax()]]
+        class_probs = {label_names[i]: float(probs[i].item()) * 100 for i in range(len(label_names))}
 
-        class_probs = {}
-        for i, prob in enumerate(probs):
-            # 각 품종의 점수를 0~100 사이의 '닮음 지수'로 변환합니다.
-            class_probs[label_names[i]] = float(prob.item()) * 100
-
-        return predicted_label, class_probs
+        return top_labels, class_probs, top_scores

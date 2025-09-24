@@ -176,8 +176,9 @@
             }
             const form = new FormData();
             form.append('image', selectedFile);
-            try {
-                const resp = await fetch(`${SPRING_BASE}/classify`, { method: 'POST', body: form });
+
+            try{
+                const resp = await fetch(`${AI_BASE}/classify?top_k=3`, { method: 'POST', body: form });
                 if (!resp.ok) throw new Error('분석 요청 실패');
                 const data = await resp.json();
                 sessionStorage.setItem('classifyResult', JSON.stringify(data));
@@ -185,7 +186,9 @@
                 console.warn('분석 실패, 임의 추천으로 진행합니다.', e);
                 sessionStorage.removeItem('classifyResult');
             }
-            window.location.href = '/analyzing.html';
+            localStorage.setItem('userImage', imagePreview.src);
+            // Pass through to analyzing page (could append version if needed later)
+            window.location.href = '/analyzing.html?v=3';
         });
     </script>
 </body>

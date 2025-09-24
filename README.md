@@ -54,6 +54,15 @@ Spring Boot(백엔드) + FastAPI(이미지/챗봇 AI) + Nginx(정적/리버스 �
 ```bash
 git clone https://github.com/dorae222/hackathon_test.git
 cd hackathon_test
+```
+
+Windows (PowerShell):
+```powershell
+copy .env.example .env
+```
+
+macOS/Linux (bash/zsh):
+```bash
 cp .env.example .env
 ```
 
@@ -91,10 +100,13 @@ docker compose logs -f ai-chatbot
     - /api/* → Spring(컨테이너 8080 → 호스트 기본 8081)
     - /ai/chat → ai-chatbot(:8001)/chat
     - /ai/* → ai-vision(:8000)
+    - 참고: /ai/chat은 ai-chatbot 서비스로 라우팅됩니다.
 - backend-spring: 비즈니스 API 게이트웨이(컨테이너 8080 → 호스트 기본 8081)
  
 - ai-vision-service: 이미지 목록/서빙, 분류(기본 8000)
 - ai-chatbot: OpenAI 연동 챗 API(기본 8001)
+
+Nginx 프록시 경유 시 챗봇 호출 경로는 `/ai/chat` 입니다. 컨테이너 간 내부 통신은 `http://ai-chatbot:8001` / `http://ai-vision:8000` 을 사용합니다.
 
 모든 포트는 `.env`로 조정할 수 있습니다. 기본값은 `.env.example` 참고.
 본 저장소의 기본 설정은 다음과 같습니다(호스트 기준):
